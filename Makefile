@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I.
+CFLAGS=-I. -g
 DEPS=main.h filters.h
 OBJ=main.o filters.o
 

@@ -11,11 +11,10 @@
 int main(int argc, char** argv) {
 	//Check if number of arguments is correct
 	readArgs(argc, argv);
-	printf("Directory to search: %s\nFilename to find: %s\n", argv[1], argv[2]);
+	printf("Directory to search: %s\n", argv[1]);
 	// Create startDir with a length of the max filepath size plus one (for null terminator)
 	char startDir[PATH_MAX + 1];
 	strcpy(startDir, argv[1]);
-	printf("argv[1]: %s\n", argv[1]);
 	// Get the filters that the user want to use
 	userFilters* filters = getFilters();
 	// Run a search using the filters the user has chosen
@@ -33,8 +32,8 @@ void genericSearch(char* startDir, userFilters* filters) {
 		// Go through every directory entry
 		struct dirent* directoryEntry = readdir(directoryPointer);
 		while(directoryEntry != NULL) {
-			// If the directoryEntry is a regular file
-			if(directoryEntry->d_type == DT_REG) {
+			// If the directoryEntry is not a directory (i.e not a traversible folder))
+			if(directoryEntry->d_type != DT_DIR) {
 				// Assume the file matches
 				int match = 1;
 				// Run every filter against the directoryEntry
@@ -81,6 +80,7 @@ void genericSearch(char* startDir, userFilters* filters) {
 userFilters* getFilters() {
 	printf("Here are the filters that you can apply:\n");
 	printf("1. filename\n");	
+	printf("2. symlink\n");
 	// Get the number of filters that will be applied
 	printf("How many filters would you like to apply?\n");
 	int numFilters;
@@ -107,6 +107,14 @@ userFilters* getFilters() {
 				printf("Filename to filter by: ");
 				scanf("%s", filename);
 				filter->filterArgument = (void*)filename;
+				break;
+			case 2:
+				// The user chose 'symlink'
+				filter->filter = &symlinkFilter;
+				int* symlinkFilterType = (int*)malloc(sizeof(int));
+				printf("Type \'1\' to search for symlinks only or type \'2\' to exclude symlinks from your search\n");
+				scanf("%d", symlinkFilterType);
+				filter->filterArgument = (void*)symlinkFilterType;
 				break;
 		}
 		filtersStruct->filters[i] = filter;
