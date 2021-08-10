@@ -6,3 +6,4 @@ The program has been designed so the filters are modular and it is easy to add m
 
 ## Filters
 - filename
+- symlink
